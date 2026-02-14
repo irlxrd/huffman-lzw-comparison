@@ -1,7 +1,7 @@
 import time
 import sys
-from huffman import HuffmanCoding
-from lzw import compress as lzw_compress, decompress as lzw_decompress
+from src.huffman import HuffmanCoding
+from src.lzw import compress as lzw_compress, decompress as lzw_decompress
 
 
 def test_huffman(text):

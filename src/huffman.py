@@ -318,4 +318,96 @@ class HuffmanCoding:
 		print("Compressed")
 		return output_path
 
+	# Functions for decompression:
+
+	def remove_padding(self, padded_encoded_text):
+		"""Remove padding from encoded text.
+		
+		Reads the first 8 bits to determine how much padding was added,
+		then removes that padding from the end of the text.
+		
+		Args:
+			padded_encoded_text: Binary string with padding info prepended
+			
+		Returns:
+			Binary string with padding removed
+		"""
+		# First 8 bits contain the padding amount
+		padded_info = padded_encoded_text[:8]
+		extra_padding = int(padded_info, 2)
+
+		# Remove padding info and the extra padding from end
+		padded_encoded_text = padded_encoded_text[8:]
+		encoded_text = padded_encoded_text[:-extra_padding]
+
+		return encoded_text
+
+	def decode_text(self, encoded_text):
+		"""Decode binary string back to original text using reverse mapping.
+		
+		Reads the encoded text bit by bit, building up codes until we find
+		a match in the reverse mapping dictionary.
+		
+		Args:
+			encoded_text: Binary string to decode
+			
+		Returns:
+			Decoded original text
+		"""
+		current_code = ""
+		decoded_text = ""
+
+		for bit in encoded_text:
+			current_code += bit
+			# Check if current code matches any character
+			if current_code in self.reverse_mapping:
+				character = self.reverse_mapping[current_code]
+				decoded_text += character
+				current_code = ""  # Reset for next character
+
+		return decoded_text
+
+	def decompress(self, input_path):
+		"""Main decompression method that reverses the Huffman encoding process.
+		
+		Decompression pipeline:
+		1. Read compressed file
+		2. Convert bytes back to binary string
+		3. Remove padding
+		4. Decode binary string to text using reverse mapping
+		5. Write decompressed text to file
+		
+		Args:
+			input_path: Path to compressed file (.bin)
+			
+		Returns:
+			Path to the decompressed output file (.txt)
+		"""
+		# Create output filename by replacing .bin with _decompressed.txt
+		filename = input_path.replace(".bin", "")
+		output_path = filename + "_decompressed.txt"
+
+		with open(input_path, 'rb') as file, open(output_path, 'w') as output:
+			# Read compressed bytes
+			bit_string = ""
+			byte = file.read(1)
+			while byte:
+				# Convert each byte to 8-bit binary string
+				byte_value = ord(byte)
+				bits = bin(byte_value)[2:].zfill(8)
+				bit_string += bits
+				byte = file.read(1)
+
+			# Remove padding
+			encoded_text = self.remove_padding(bit_string)
+
+			# Decode text using reverse mapping
+			decompressed_text = self.decode_text(encoded_text)
+			
+			# Write to output file
+			output.write(decompressed_text)
+
+		print("Decompressed")
+		return output_path
+
 

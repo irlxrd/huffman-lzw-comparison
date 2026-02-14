@@ -1,0 +1,22 @@
+[project]
+name = "compression-tool"
+version = "0.1.0"
+description = "A tool to compare Huffman and LZW compression algorithms"
+authors = [
+    {name = "Irem"}
+]
+requires-python = ">=3.10"
+dependencies = [
+    "rich (>=14.3.2,<15.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.2,<10.0.0)",
+    "pytest-cov (>=7.0.0,<8.0.0)"
+]
