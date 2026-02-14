@@ -88,7 +88,7 @@ def create_stats_table(huffman_stats, lzw_stats):
     )
     
     # Compressed Size
-    winner = "🏆 Huffman" if huffman_stats['compressed_size'] < lzw_stats['compressed_size'] else "🏆 LZW"
+    winner = "Huffman" if huffman_stats['compressed_size'] < lzw_stats['compressed_size'] else "LZW"
     table.add_row(
         "Compressed Size",
         f"{huffman_stats['compressed_size']} bytes",
@@ -97,7 +97,7 @@ def create_stats_table(huffman_stats, lzw_stats):
     )
     
     # Compression Ratio
-    winner = "🏆 Huffman" if huffman_stats['compression_ratio'] > lzw_stats['compression_ratio'] else "🏆 LZW"
+    winner = "Huffman" if huffman_stats['compression_ratio'] > lzw_stats['compression_ratio'] else "LZW"
     table.add_row(
         "Compression Ratio",
         f"{huffman_stats['compression_ratio']:.2f}%",
@@ -106,7 +106,7 @@ def create_stats_table(huffman_stats, lzw_stats):
     )
     
     # Compression Time
-    winner = "🏆 Huffman" if huffman_stats['compress_time'] < lzw_stats['compress_time'] else "🏆 LZW"
+    winner = "Huffman" if huffman_stats['compress_time'] < lzw_stats['compress_time'] else "LZW"
     table.add_row(
         "Compression Time",
         f"{huffman_stats['compress_time']:.6f}s",
@@ -136,10 +136,10 @@ def show_welcome():
 def show_menu():
     """Display main menu and get user choice."""
     console.print("\n[bold cyan]=== Main Menu ===[/bold cyan]")
-    console.print("1. 📝 Enter text manually")
-    console.print("2. 📁 Load from file")
-    console.print("3. 🎯 Run test cases")
-    console.print("4. ❌ Exit")
+    console.print("1. Enter text manually")
+    console.print("2. Load from file")
+    console.print("3. Run test cases")
+    console.print("4. Exit")
     console.print()
     
     choice = Prompt.ask("Select an option", choices=["1", "2", "3", "4"])
@@ -185,7 +185,7 @@ def run_comparison(text, show_text=True):
         preview = text[:100] + "..." if len(text) > 100 else text
         console.print(Panel(
             f"[dim]{preview}[/dim]",
-            title=f"📄 Input Text ({len(text)} characters)",
+            title=f"Input Text ({len(text)} characters)",
             border_style="blue"
         ))
         console.print()
@@ -220,14 +220,14 @@ def run_comparison(text, show_text=True):
         diff = huffman_stats['compression_ratio'] - lzw_stats['compression_ratio']
         console.print(Panel(
             f"[bold green]Huffman Coding[/bold green] achieved better compression by [bold]{diff:.2f}%[/bold]",
-            title="🎉 Winner",
+            title="Winner",
             border_style="green"
         ))
     else:
         diff = lzw_stats['compression_ratio'] - huffman_stats['compression_ratio']
         console.print(Panel(
             f"[bold yellow]LZW Compression[/bold yellow] achieved better compression by [bold]{diff:.2f}%[/bold]",
-            title="🎉 Winner",
+            title="Winner",
             border_style="yellow"
         ))
 
@@ -316,12 +316,12 @@ def main():
             run_test_cases()
         
         elif choice == "4":
-            console.print("\n[bold blue]👋 Thanks for using the compression tool![/bold blue]\n")
+            console.print("\n[bold blue]Thanks for using the compression tool![/bold blue]\n")
             break
         
         console.print()
         if not Confirm.ask("Would you like to continue?"):
-            console.print("\n[bold blue]👋 Thanks for using the compression tool![/bold blue]\n")
+            console.print("\n[bold blue]Thanks for using the compression tool![/bold blue]\n")
             break
 
 
@@ -330,4 +330,4 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         console.print("\n\n[bold red]Interrupted by user[/bold red]")
-        console.print("[bold blue]👋 Goodbye![/bold blue]\n")
+        console.print("[bold blue]Goodbye![/bold blue]\n")
