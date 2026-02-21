@@ -13,15 +13,13 @@ Name                Stmts   Miss  Cover
 -----------------------------------------
 src/huffman.py        115      3    97%
 src/lzw.py             47     12    74%
-src/comparison.py      86     86     0%
-src/ui.py             169    169     0%
 -----------------------------------------
 TOTAL                 418    270    35%
 ```
 
 - **Huffman**: 97% coverage (missing: error edge cases)
 - **LZW**: 74% coverage (missing: main function)
-- **UI/Comparison**: 0% (not tested yet)
+
 
 ## Running Tests
 
