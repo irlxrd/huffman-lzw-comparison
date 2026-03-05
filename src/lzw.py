@@ -1,12 +1,117 @@
-def compress(data):
+import math
+
+
+def get_bit_width(dictionary_size):
+    """Calculate the number of bits needed to represent the current dictionary size.
+    
+    Args:
+        dictionary_size: Current size of the dictionary
+        
+    Returns:
+        Number of bits needed (minimum 9)
     """
-    Compress data using LZW algorithm.
+    # Need enough bits to represent values from 0 to dictionary_size-1
+    # Start with 9 bits minimum (for 256-511)
+    return max(9, math.ceil(math.log2(dictionary_size)))
+
+
+def pack_codes_to_bytes(codes):
+    """Pack integer codes into a variable-width bitstream and convert to bytes.
+    
+    As the dictionary grows during compression, we use progressively more bits:
+    - 256-511: 9 bits
+    - 512-1023: 10 bits
+    - 1024-2047: 11 bits
+    - And so on...
+    
+    Args:
+        codes: List of integer codes from LZW compression
+        
+    Returns:
+        bytearray containing the packed compressed data
+    """
+    bit_string = ""
+    dictionary_size = 256  # Start with ASCII table
+    
+    for code in codes:
+        # Calculate current bit width based on dictionary size
+        width = get_bit_width(dictionary_size)
+        # Convert code to binary string with appropriate width
+        bit_string += format(code, f'0{width}b')
+        # Dictionary grows by 1 after each code output
+        dictionary_size += 1
+    
+    # Pad to byte boundary
+    padding = (8 - len(bit_string) % 8) % 8
+    bit_string += '0' * padding
+    
+    # Store padding info in first byte
+    result = bytearray([padding])
+    
+    # Convert bit string to bytes
+    for i in range(0, len(bit_string), 8):
+        byte = bit_string[i:i+8]
+        result.append(int(byte, 2))
+    
+    return result
+
+
+def unpack_bytes_to_codes(packed_data):
+    """Unpack bytes back into integer codes using variable-width decoding.
+    
+    Args:
+        packed_data: bytearray of compressed data
+        
+    Returns:
+        List of integer codes
+    """
+    # First byte contains padding info
+    padding = packed_data[0]
+    
+    # Convert remaining bytes to bit string
+    bit_string = ""
+    for byte in packed_data[1:]:
+        bit_string += format(byte, '08b')
+    
+    # Remove padding from end
+    if padding > 0:
+        bit_string = bit_string[:-padding]
+    
+    # Decode variable-width codes
+    codes = []
+    dictionary_size = 256
+    pos = 0
+    
+    while pos < len(bit_string):
+        width = get_bit_width(dictionary_size)
+        if pos + width > len(bit_string):
+            break
+        
+        # Extract code of current width
+        code_bits = bit_string[pos:pos+width]
+        code = int(code_bits, 2)
+        codes.append(code)
+        
+        pos += width
+        dictionary_size += 1
+    
+    return codes
+
+
+def compress(data):
+    """Compress data using LZW algorithm with variable-width bitpacking.
+    
+    Args:
+        data: String to compress
+        
+    Returns:
+        bytearray containing compressed data
     """
     # Initializing a dictionary with all ASCII values
     dictionary_size = 256
     dictionary = {chr(i): i for i in range(dictionary_size)}
     
-    result = []
+    codes = []
     current_string = ""
     
     for char in data:
@@ -15,7 +120,7 @@ def compress(data):
             current_string = combined
         else:
             # Output the code for current_string
-            result.append(dictionary[current_string])
+            codes.append(dictionary[current_string])
             # Add combined to dictionary
             dictionary[combined] = dictionary_size
             dictionary_size += 1
@@ -23,15 +128,24 @@ def compress(data):
     
     # Output the code for remaining string
     if current_string:
-        result.append(dictionary[current_string])
+        codes.append(dictionary[current_string])
     
-    return result
+    # Pack codes into bytes
+    return pack_codes_to_bytes(codes)
 
 
 def decompress(compressed):
+    """Decompress data using LZW algorithm with variable-width bitpacking.
+    
+    Args:
+        compressed: bytearray of compressed data
+        
+    Returns:
+        Original decompressed string
     """
-    Decompress data using LZW algorithm.
-    """
+    # Unpack bytes into codes
+    codes = unpack_bytes_to_codes(compressed)
+    
     # Initializing a dictionary with all ASCII values
     dictionary_size = 256
     dictionary = {i: chr(i) for i in range(dictionary_size)}
@@ -39,10 +153,10 @@ def decompress(compressed):
     result = []
     
     # Get first code
-    previous = chr(compressed[0])
+    previous = chr(codes[0])
     result.append(previous)
     
-    for code in compressed[1:]:
+    for code in codes[1:]:
         if code in dictionary:
             entry = dictionary[code]
         elif code == dictionary_size:
@@ -64,24 +178,23 @@ def decompress(compressed):
 
 def main():
     # Example usage
-    original = "ABcabcDABks"
+    original = "TOBEORNOTTOBEORTOBEORNOT"
     print(f"Original: {original}")
-    print(f"Original size: {len(original)} characters")
+    print(f"Original size: {len(original)} bytes\n")
     
     # Compress
     compressed = compress(original)
-    print(f"\nCompressed: {compressed}")
-    print(f"Compressed size: {len(compressed)} codes")
+    print(f"Compressed: {compressed.hex()}")
+    print(f"Compressed size: {len(compressed)} bytes")
     
     # Calculate compression ratio
     compression_ratio = (1 - len(compressed) / len(original)) * 100
-    print(f"Compression ratio: {compression_ratio:.2f}%")
+    print(f"Compression ratio: {compression_ratio:.2f}%\n")
     
     # Decompress
     decompressed = decompress(compressed)
-    print(f"\nDecompressed: {decompressed}")
+    print(f"Decompressed: {decompressed}")
     print(f"Match: {original == decompressed}")
-
 
 if __name__ == "__main__":
     main()

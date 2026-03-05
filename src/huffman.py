@@ -225,7 +225,8 @@ class HuffmanCoding:
 		"""
 		BITS_PER_BYTE = 8
 		# Calculate how many bits we need to add
-		extra_padding = BITS_PER_BYTE - len(encoded_text) % BITS_PER_BYTE
+		extra_padding = (BITS_PER_BYTE - len(encoded_text) % BITS_PER_BYTE) % BITS_PER_BYTE
+		
 		# Add padding zeros
 		encoded_text += "0" * extra_padding
 
@@ -338,7 +339,7 @@ class HuffmanCoding:
 
 		# Remove padding info and the extra padding from end
 		padded_encoded_text = padded_encoded_text[8:]
-		encoded_text = padded_encoded_text[:-extra_padding]
+		encoded_text = padded_encoded_text[:-extra_padding] if extra_padding > 0 else padded_encoded_text
 
 		return encoded_text
 

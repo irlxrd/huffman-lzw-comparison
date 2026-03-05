@@ -9,8 +9,8 @@ from rich.prompt import Prompt, Confirm
 from rich.layout import Layout
 from rich.text import Text
 from rich import box
-from src.huffman import HuffmanCoding
-from src.lzw import compress as lzw_compress, decompress as lzw_decompress
+from huffman import HuffmanCoding
+from lzw import compress as lzw_compress, decompress as lzw_decompress
 
 console = Console()
 
@@ -57,7 +57,7 @@ def test_lzw(text):
     decompress_time = time.time() - start_decompress
     
     original_size = len(text)
-    compressed_size = len(compressed) * 2
+    compressed_size = len(compressed)
     
     return {
         'original_size': original_size,
@@ -65,7 +65,6 @@ def test_lzw(text):
         'compression_ratio': (1 - compressed_size / original_size) * 100,
         'compress_time': compress_time,
         'decompress_time': decompress_time,
-        'codes_count': len(compressed),
         'match': text == decompressed
     }
 
