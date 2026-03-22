@@ -19,3 +19,6 @@ There was a lot of missing documentation, I worked on them. Made unit tests, and
 
 Week 6
 I am currently doing the final checks. Making sure that everything is well reported and the program works as it is supposed to. Got a feedback about python not finding the src package, created readme and wrote clear installation instructions.
+
+After presentation: 
+I made test_performance.py to compare huffman and lzw performances on different sizes of natural language datasets. Edited docs according to changes I made. Cleaned up the whole codebase to make it more understandable. 

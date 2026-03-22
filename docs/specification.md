@@ -81,7 +81,7 @@ This project implements and compares two fundamental lossless data compression a
 
 1. **Text Files**
    - Format: Plain text (UTF-8 or ASCII)
-   - Size: Any size (tested up to 10 MB)
+  - Size: Any size (tested up to 16 MB in benchmark)
    - Content: Natural language text, code, or any text-based data
 
 2. **Compressed Files**
@@ -189,6 +189,45 @@ original_text = lzw_decompress(compressed_codes)
 - Worst case: Random data (may expand data)
 - Performs well on: Repetitive patterns, structured data
 
+## Testing and Benchmarking
+
+The project test suite includes:
+
+- `tests/test_huffman.py`: Unit tests for Huffman coding behavior and file-based round trips.
+- `tests/test_lzw.py`: Unit tests for LZW compression/decompression and edge cases.
+- `tests/test_performance.py`: Performance comparison test for Huffman and LZW.
+
+`tests/test_performance.py` I used files form the wikipedia kaggle data set (https://www.kaggle.com/datasets/ffatty/plaintext-wikipedia-full-english). The benchmark covers these sizes:
+
+- `1 kB`
+- `4 kB`
+- `16 kB`
+- `64 kB`
+- `256 kB`
+- `1 MB`
+- `4 MB`
+- `16 MB`
+
+For each size, it reports compression ratio and runtime for both algorithms and verifies that decompression reproduces the original text.
+Here are my results: 
+Compression benchmark (natural text from wiki_* corpus)
+size    | bytes   | huff_ratio | huff_time_s | lzw_ratio | lzw_time_s
+1 kB    |    1000 | 0.5390     | 0.001560    | 0.6370    | 0.002484
+4 kB    |    4000 | 0.5660     | 0.005056    | 0.5687    | 0.006181
+16 kB   |   16000 | 0.5604     | 0.017767    | 0.4968    | 0.043455
+64 kB   |   64000 | 0.5547     | 0.090397    | 0.4436    | 0.072070
+256 kB  |  256000 | 0.5725     | 0.226351    | 0.4294    | 0.261929
+1 MB    | 1000000 | 0.5734     | 0.833733    | 0.4033    | 1.021212
+4 MB    | 4000000 | 0.5741     | 3.356430    | 0.3786    | 4.301436
+16 MB   | 16000000 | 0.5742     | 13.165663    | 0.3414    | 18.282189
+
+The trends in the table come from the different ways Huffman coding and Lempel–Ziv–Welch exploit redundancy.
+
+For small inputs, Huffman performs better because it immediately uses character frequencies, which stabilize quickly in natural text. LZW starts with an empty dictionary, so it cannot yet capture repeated patterns.
+
+As the input size grows, LZW improves significantly because it learns and reuses common substrings (like words and suffixes). This allows it to compress more effectively than Huffman, whose performance plateaus since it only models single-character probabilities.
+
+In short: Huffman is better for small data, while LZW becomes more efficient on larger text by exploiting repetition and structure.
 
 ## Project Scope
 
@@ -198,5 +237,5 @@ The implementation includes:
 - Full LZW compression (compression and decompression)
 - Comparison framework with performance metrics
 - User interface for interactive testing
-- Comprehensive test suite
+- Comprehensive test suite, including `tests/test_performance.py`
 
